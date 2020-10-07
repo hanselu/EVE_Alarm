@@ -9,7 +9,7 @@ from ctypes.wintypes import MAX_PATH
 
 baseSystemName = 'ZK-YQ3'
 baseSystemID = 0
-passTime = 1800
+passTime = 300
 alarmDistance = 10
 
 
@@ -173,7 +173,7 @@ def getLogPath(channelName: str = '', listener: str = '') -> list:
 
 alarm_Init()
 logFileName = getLogPath('泛北防空识别区', '欠我10块')
-# print(logFileName)
+print(logFileName)
 for alarim in getAlarmList(logFileName):
     print(alarim)
 
