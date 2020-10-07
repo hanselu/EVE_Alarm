@@ -13,7 +13,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.alarmList = []
         self.uiInit()
         self.dataInit()
-        self.btn_Start.clicked.connect(self.btnStartOnclick)
+        self.btn_Start.clicked.connect(self.btnStartOnClick)
+        self.btn_Save.clicked.connect(self.btnSaveOnClick)
 
     def uiInit(self):
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -21,6 +22,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         headerLabels = ['时间', '星系', '距离', '预警人']
         self.table_Alarm.setColumnCount(len(headerLabels))
         self.table_Alarm.setHorizontalHeaderLabels(headerLabels)
+
+        # 读取配置
+        test.readSetting()
+        self.txt_BaseSystem.setText(test.baseSystemName)
+        self.txt_Overtime.setText(str(test.overtime))
 
     def dataInit(self):
         test.alarm_Init()
@@ -72,6 +78,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.table_Alarm.resizeRowsToContents()
         self.table_Alarm.horizontalHeader().setStretchLastSection(True)
 
-    def btnStartOnclick(self):
+    def btnStartOnClick(self):
+        self.updateAlarmList()
+        self.showAlarmList()
+
+    def btnSaveOnClick(self):
+        baseSystemName = self.txt_BaseSystem.text()
+        overtime = int(self.txt_Overtime.text())
+        # print(baseSystemName)
+        # print(overtime)
+        test.saveSetting(baseSystemName, overtime)
+
+        # 保存配置后立刻更新数据
         self.updateAlarmList()
         self.showAlarmList()

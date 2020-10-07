@@ -26,7 +26,7 @@
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,1,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,0,1,0">
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
@@ -52,12 +52,19 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="txt_Passtime">
+       <widget class="QLineEdit" name="txt_Overtime">
         <property name="text">
          <string>600</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_Save">
+        <property name="text">
+         <string>保存配置</string>
         </property>
        </widget>
       </item>

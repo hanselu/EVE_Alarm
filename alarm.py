@@ -9,7 +9,7 @@ from ctypes.wintypes import MAX_PATH
 
 baseSystemName = 'ZK-YQ3'
 baseSystemID = 0
-passTime = 300
+overtime = 300
 alarmDistance = 10
 
 
@@ -104,7 +104,7 @@ def getAlarmList(logFilePath: str) -> list:
                 continue
 
             dt = int(time.time()) - logInfo['ts']
-            if dt <= passTime:
+            if dt <= overtime:
                 # logInfo['dic'] = calDistance()
                 logInfo['dt'] = showTimeDiff(dt)
                 distance = calDistance(logInfo['systemName'])

@@ -8,18 +8,31 @@ from ctypes.wintypes import MAX_PATH
 import EVE_DB
 import requests
 
-# logFileName = r'C:\Users\Hanse\Documents\EVE\logs\Chatlogs\泛北防空识别区_20201006_051238.txt'
 logFileName = ''
 baseSystemName = '3-QYVE'
 baseSystemID = 0
-passTime = 900
+overtime = 900
+settingFileName = 'setting.json'
+
+
+# alarmList = []
 
 
 def alarm_Init():
+    global baseSystemName
     global baseSystemID
     global logFileName
+    global overtime
+    readSetting()
     baseSystemID = EVE_DB.getSystemID(baseSystemName)
     logFileName = getLogPath('泛北防空识别区', '欠我10块')
+
+    print('初始化')
+    print('基地星系', baseSystemName)
+    print('基地星系ID', baseSystemID)
+    print('日志路径', logFileName)
+    # print('预警距离', logFileName)
+    print('超时', overtime)
 
 
 def getFirstRe(reStr: str, searchStr: str) -> str:
@@ -34,6 +47,39 @@ def getFirstRe(reStr: str, searchStr: str) -> str:
         return match.group(0)
     else:
         return ''
+
+
+def readSetting():
+    global baseSystemName
+    global overtime
+    global settingFileName
+    global settingFileName
+    if os.path.exists(settingFileName):
+        with open(settingFileName, 'r', encoding='utf8') as f:
+            jsonObj = json.loads(f.read())
+            baseSystemName = jsonObj['baseSystem']
+            overtime = jsonObj['overtime']
+    else:
+        baseSystemName = 'ZK-YQ3'
+        overtime = 600
+
+
+def saveSetting(bsn: str, ot: int):
+    global settingFileName
+    global baseSystemName
+    global baseSystemID
+    global overtime
+    setting = {
+        'baseSystem': bsn,
+        'overtime': ot
+    }
+    settingStr = json.dumps(setting)
+    with open(settingFileName, 'w', encoding='utf8') as f:
+        f.write(settingStr)
+
+    baseSystemName = bsn
+    overtime = ot
+    baseSystemID = EVE_DB.getSystemID(baseSystemName)
 
 
 def getLogListener(logFilePath: str) -> str:
@@ -123,6 +169,11 @@ def getSystemName(logStr: str) -> str:
 
 
 def calRoute(targetSystemID: int) -> int:
+    global baseSystemID
+    if baseSystemID == 0:
+        print('读取基地星系失败')
+        return -1
+
     if targetSystemID == baseSystemID:
         return 0
 
@@ -131,6 +182,7 @@ def calRoute(targetSystemID: int) -> int:
     if ret.status_code == 200:
         return len(json.loads(ret.text)) - 1
     else:
+        print(url)
         return -1
 
 
@@ -181,14 +233,15 @@ def getAlarmIndex(aList: list, al: dict) -> int:
 
 
 def getAlarmList() -> list:
-    global passTime
+    global overtime
+    # global alarmList
+    alarmList = []
     allLines = re.findall(
         r'\[ \d{4}.\d{2}.\d{2} \d{2}:\d{2}:\d{2} ] .* > .*[a-zA-Z0-9]{1,4}-[a-zA-Z0-9]{1,4}.*', getLogText())
 
-    alarmList = []
     for s in allLines:
         dt = int(time.time()) - getTimestamp(s)
-        if dt < passTime:
+        if dt < overtime:
             name = getSystemName(s)
             systemID = EVE_DB.getSystemID(name)
             if systemID == 0:

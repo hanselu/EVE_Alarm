@@ -50,11 +50,16 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.label_2)
 
-        self.txt_Passtime = QLineEdit(self.centralwidget)
-        self.txt_Passtime.setObjectName(u"txt_Passtime")
-        self.txt_Passtime.setAlignment(Qt.AlignCenter)
+        self.txt_Overtime = QLineEdit(self.centralwidget)
+        self.txt_Overtime.setObjectName(u"txt_Overtime")
+        self.txt_Overtime.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout.addWidget(self.txt_Passtime)
+        self.verticalLayout.addWidget(self.txt_Overtime)
+
+        self.btn_Save = QPushButton(self.centralwidget)
+        self.btn_Save.setObjectName(u"btn_Save")
+
+        self.verticalLayout.addWidget(self.btn_Save)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -73,7 +78,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.btn_Auto)
 
         self.verticalLayout.setStretch(1, 1)
-        self.verticalLayout.setStretch(5, 1)
+        self.verticalLayout.setStretch(6, 1)
 
         self.horizontalLayout.addLayout(self.verticalLayout)
 
@@ -95,7 +100,8 @@ class Ui_MainWindow(object):
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u9884\u8b66\u661f\u7cfb", None))
         self.txt_BaseSystem.setText(QCoreApplication.translate("MainWindow", u"3-QYVE", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u9884\u8b66\u65f6\u957f", None))
-        self.txt_Passtime.setText(QCoreApplication.translate("MainWindow", u"600", None))
+        self.txt_Overtime.setText(QCoreApplication.translate("MainWindow", u"600", None))
+        self.btn_Save.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u914d\u7f6e", None))
         self.btn_Start.setText(QCoreApplication.translate("MainWindow", u"\u624b\u52a8\u5237\u65b0", None))
         self.btn_Auto.setText(QCoreApplication.translate("MainWindow", u"\u81ea\u52a8\u5237\u65b0", None))
     # retranslateUi
