@@ -1,182 +1,82 @@
-import requests
+import common
 import re
-import time
-import json
-import EVE_DB
-import os
-import ctypes
-from ctypes.wintypes import MAX_PATH
-
-baseSystemName = 'ZK-YQ3'
-baseSystemID = 0
-overtime = 300
-alarmDistance = 10
+import esi
 
 
-def alarm_Init():
-    global baseSystemID
-    baseSystemID = EVE_DB.getSystemID(baseSystemName)
+class Alarm:
+    ts: int
+    speaker: str = 'EVE系统'
+    solar_system: str = None
+    solar_system_id: int = None
+    route: list = None
+    msg: str
+
+    def __init__(self, txt: str, location: str = None) -> None:
+        result = re.search(
+            r'\[ (\d{4}.\d{2}.\d{2} \d{2}:\d{2}:\d{2}) \] (.*?) > (.*)', txt)
+        if result:
+            self.ts = common.str_to_ts(result.group(1))
+            self.speaker = result.group(2)
+            self.msg = result.group(3)
+
+            # 读取星系星系
+            for solar_system in esi.get_solar_system_name_list():
+                if self.msg.find(solar_system) > -1:
+                    self.solar_system = solar_system
+                    self.solar_system_id = esi.get_solar_system_id(
+                        solar_system)
+
+                    # 计算距离
+                    if location:
+                        self.update_location(location)
+                    break
+
+    def __str__(self) -> str:
+        time_str = common.ts_to_str_format(self.ts)
+        s = f'{time_str} [{self.speaker}]\t{self.solar_system}'
+        d = self.distance()
+        if d < 0:
+            return s
+        elif d == 0:
+            return f'{s}\t 杀到本地了'
+        else:
+            return f'{s}\t{self.distance()}跳 入口 {self.enter()}'
+
+    @property
+    def dt(self) -> int:
+        return common.cal_dt(self.ts)
+
+    def update_location(self, location: str):
+        self.route = esi.cal_route(location, self.solar_system)
+        return self.route
+
+    def distance(self, location: str = None):
+        if location:
+            self.update_location(location)
+
+        if self.route is None:
+            return -1
+        else:
+            return len(self.route)-1
+
+    def enter(self, location: str = None) -> str:
+        if location:
+            self.update_location(location)
+
+        if self.distance() == 0:
+            return location
+        else:
+            return esi.get_solar_system_name(self.route[1])
 
 
-def getFirstRe(reStr: str, searchStr: str) -> str:
-    """
-    获取正则表达式的第一个匹配值
-    :param reStr: 正则表达式
-    :param searchStr: 要搜索的字符串
-    :return: 第一个匹配的结果，若无匹配则返回空字符串
-    """
-    match = re.search(reStr, searchStr)
-    if match is not None:
-        return match.group(0)
-    else:
-        return ''
-
-
-def analysisLog(logStr: str) -> dict:
-    """
-    解析日志内容
-    :param logStr: 日志原文
-    :return:
-    """
-    # match = re.match(r'\[ (?P<Time>\d{4}.\d{2}.\d{2} \d{2}:\d{2}:\d{2}) ] (?P<Char>.*) > (?P<Content>.*)'
-    #                  , logStr)
-    match = re.search(
-        r'\[ (?P<Time>\d{4}.\d{2}.\d{2} \d{2}:\d{2}:\d{2}) ] (?P<Char>.*) > .*(?P<SystemName>([a-zA-Z]|\d)+-([a-zA-Z]|\d)+)'
-        , logStr)
-    if match is not None:
-        timeStr = match.group('Time')
-        ts = int(time.mktime(time.strptime(timeStr, '%Y.%m.%d %H:%M:%S')))
-        charName = match.group('Char')
-        systemName = match.group('SystemName')
-        return {
-            'ts': ts,
-            'char': charName,
-            'systemName': systemName
-        }
-    else:
-        return {}
-
-
-def calRoute(targetSystemID: int) -> int:
-    if targetSystemID == baseSystemID:
-        return 0
-
-    url = f'https://esi.evepc.163.com/latest/route/{baseSystemID}/{targetSystemID}/?datasource=serenity&flag=shortest'
-    ret = requests.get(url)
-    if ret.status_code == 200:
-        return len(json.loads(ret.text)) - 1
-    else:
-        return -1
-
-
-def calDistance(targetSystemName: str) -> int:
-    targetSystemList = EVE_DB.searchSystemID(targetSystemName)
-    distanceList = []
-    for s in targetSystemList:
-        distanceList.append(calRoute(s['id']))
-
-    return min(distanceList)
-
-
-def showTimeDiff(dt: int) -> str:
-    h = int(dt / 3600)
-    m = int((dt - h * 3600) / 60)
-    s = dt - h * 3600 - m * 60
-
-    dtStr = ''
-
-    if h > 0:
-        dtStr = f'{h}小时'
-
-    if m > 0:
-        dtStr = f'{dtStr}{m}分'
-
-    return f'{dtStr}{s}秒前'
-
-
-def getAlarmList(logFilePath: str) -> list:
-    with open(logFilePath, 'r', encoding='utf16') as f:
-        logList = re.findall(r'\[ \d{4}.\d{2}.\d{2} \d{2}:\d{2}:\d{2} ] .* > .*', f.read())
-        alarmList = []
-        for log in logList:
-            logInfo = analysisLog(log)
-            if logInfo == {}:
-                continue
-
-            dt = int(time.time()) - logInfo['ts']
-            if dt <= overtime:
-                # logInfo['dic'] = calDistance()
-                logInfo['dt'] = showTimeDiff(dt)
-                distance = calDistance(logInfo['systemName'])
-                logInfo['distance'] = distance
-                alarmList.append(logInfo)
-
-        print('长度', len(alarmList))
-        return alarmList
-
-
-def getLogListener(logFilePath: str) -> str:
-    """
-    读取日志文件的监听者。
-    :param logFilePath:  日志文件路径
-    :return: 监听者名字，若无则返回空字符串。
-    """
-    listener = ''
-    with open(logFilePath, 'r', encoding='utf16') as f:
-        for line in f:
-            m = re.match(r'^\s+Listener:\s+(.*)$', line)
-            if m is not None:
-                # print(line)
-                listener = m.group(1)
-                break
-
-    return listener
-
-
-def getLogPath(channelName: str = '', listener: str = '') -> list:
-    """
-    获取日志路径
-    :param channelName: 指定频道名字
-    :param listener:  指定人物
-    :return:  日志文件路径
-    """
-    dll = ctypes.windll.shell32
-    buf = ctypes.create_unicode_buffer(MAX_PATH + 1)
-    if dll.SHGetSpecialFolderPathW(None, buf, 0x0005, False):
-        logDir = f'{buf.value}\\EVE\\logs\\Chatlogs\\'
-        files = []
-        for (dirPath, dirNames, fileNames) in os.walk(logDir):
-            for fn in fileNames:
-                # 把 dirpath 和 每个文件名拼接起来 就是全路径
-                # print(fn)
-                ts = int(time.mktime(time.strptime(getFirstRe(r'(?<=_)\d{8}_\d{6}(?=.txt)', fn), '%Y%m%d_%H%M%S')))
-                ts += 8 * 3600  # 修正时区
-                # print(ts)
-                # print(getFirstRe(r'(?<=_)\d{8}_\d{6}(?=.txt)', fn))
-                fPath = os.path.join(dirPath, fn)
-
-                files.append({
-                    'name': fPath,
-                    'ts': ts
-                })
-
-        # 排序文件
-        files.sort(key=lambda f: -f['ts'])
-
-        for logFile in files:
-            if channelName in logFile['name']:
-                if listener in getLogListener(logFile['name']):
-                    return logFile['name']
-
-        return ''
-
-
-alarm_Init()
-logFileName = getLogPath('泛北防空识别区', '欠我10块')
-print(logFileName)
-for alarim in getAlarmList(logFileName):
-    print(alarim)
-
-# print(calDistance('罗尔'))
-
-# print(EVE_DB.searchSystemID('zk'))
+if __name__ == '__main__':
+    a = Alarm('[ 2021.09.26 11:36:35 ] 欧阳疯锋 > R-P7KL  阡陌默', 'ZK-YQ3')
+    print(a)
+    print(a.route)
+    print(a.distance())
+    print(a.enter())
+    a.update_location('I1-BE8')
+    print(a)
+    print(a.route)
+    print(a.distance())
+    print(a.enter())

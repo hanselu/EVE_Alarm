@@ -1,1 +1,54 @@
-{"baseSystem": "ZK-YQ3", "overtime": 600}
+{
+    "log_path": "C:\\Users\\Hanse\\Documents\\EVE\\logs\\Chatlogs",
+    "channel": "泛北防空识别区",
+    "listerer": "万分荣幸",
+    "overtime": 86400,
+    "ignore_distance": 25,
+    "watch_area": {
+        "all_universe": false,
+        "only_north": true,
+        "only_south": false,
+        "empire_area": false,
+        "wormhole": false,
+        "gm_area": false,
+        "test_area": false,
+        "white_list": {
+            "regions": [],
+            "constellations": [],
+            "solar_system": []
+        },
+        "balck_list": {
+            "regions": [],
+            "constellations": [],
+            "solar_system": []
+        }
+    },
+    "warning_level": [
+        {
+            "level_a": {
+                "distance": 5,
+                "color": [
+                    255,
+                    0,
+                    0
+                ]
+            },
+            "level_b": {
+                "distance": 10,
+                "color": [
+                    255,
+                    255,
+                    0
+                ]
+            },
+            "level_c": {
+                "distance": 15,
+                "color": [
+                    0,
+                    170,
+                    255
+                ]
+            }
+        }
+    ]
+}

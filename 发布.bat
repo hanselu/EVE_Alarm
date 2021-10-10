@@ -1,0 +1,1 @@
+pyinstaller -F -w --distpath release main.py
