@@ -26,7 +26,7 @@ def autoTable(table: QTableWidget):
 def set_table_item(item_txt: str, distance: int) -> QTableWidgetItem:
     item = QTableWidgetItem(item_txt)
     item.setTextAlignment(Qt.AlignCenter)
-    print(setting)
+    # print(setting)
     waring_lever1 = setting['warning_level']['level_a']
     waring_lever2 = setting['warning_level']['level_b']
     waring_lever3 = setting['warning_level']['level_c']
