@@ -1,4 +1,5 @@
 from copy import deepcopy
+from threading import Thread
 
 from PySide2.QtCore import QTimer, Qt
 from PySide2.QtGui import QIcon, QColor
@@ -176,7 +177,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def btn_Manual_Clicked(self):
         # print(f'{int(common.get_ts())} 按下按钮')
-        self.update_alarms()
+        thread = Thread(target=self.update_alarms)
+        thread.start()
+        # self.update_alarms()
 
     def btn_Auto_Clicked(self):
         pass
@@ -184,11 +187,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.timer_flag = False
             self.timer.stop()
             self.btn_Auto.setText('开始刷新')
+            self.btn_Manual.setEnabled(True)
         else:
             self.timer_flag = True
             self.update_alarms()
             self.timer.start(5000)
             self.btn_Auto.setText('停止刷新')
+            self.btn_Manual.setEnabled(False)
 
     def update_alarms(self):
         self.update_dat()
