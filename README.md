@@ -30,6 +30,8 @@ EVE预警频道监控
 
    在 [Python官网](https://www.python.org/downloads/) 下载Python安装包安装即可，注意安装时，把 `Add Python 3.X to PATH`选项勾上。其余设置保持默认即可。
 
+   目前PySide2只支持Python3.9，请注意下载的Python版本。   
+
 2. 安装PiSide2
 
    打开命令提示符，输入`pip install pyside2`即可。
