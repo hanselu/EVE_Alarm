@@ -1,11 +1,18 @@
 import re
 from alarm import Alarm
 
+load_local_file_count = 0
+load_channel_file_count = 0
+
 
 def get_local(log_file: str) -> str:
     """
     读取当前位置
     """
+    # 统计读取本地频道文件次数
+    global load_local_file_count
+    load_local_file_count += 1
+    print(f'读取本地频道{load_local_file_count}次')
 
     with open(log_file, 'r', encoding='utf16') as f:
         txt_list = f.readlines()
@@ -13,7 +20,7 @@ def get_local(log_file: str) -> str:
     local_list = []
     for line in txt_list:
         result = re.search(
-            r'\[ (\d{4}.\d{2}.\d{2} \d{2}:\d{2}:\d{2}) \] EVE系统 > 频道更换为本地：(.*)', line)
+            r'\[ (\d{4}.\d{2}.\d{2} \d{2}:\d{2}:\d{2}) ] EVE系统 > 频道更换为本地：(.*)', line)
 
         if result:
             local_list.append(result.group(2))
@@ -25,6 +32,11 @@ def get_local(log_file: str) -> str:
 
 
 def get_alarm_list(log_file: str, overtime: int, location: str = None) -> list:
+    # 统计读取预警频道文件次数
+    global load_channel_file_count
+    load_channel_file_count += 1
+    print(f'读取预警频道{load_channel_file_count}次')
+
     with open(log_file, 'r', encoding='utf16') as f:
         txt_list = f.readlines()
 

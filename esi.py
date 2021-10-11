@@ -4,13 +4,17 @@ from os.path import exists
 from os import makedirs
 
 solar_system_dict = {}
-solar_system_list = []
+solar_system_name_list = []
 
 
 def init():
     global solar_system_dict
     with open('./data/solar_system.json', 'r', encoding='utf8') as f:
         solar_system_dict = json.load(f)
+
+    global solar_system_name_list
+    for solar_system in solar_system_dict:
+        solar_system_name_list.append(solar_system['name'])
 
 
 def get_solar_system_id(solar_system_name: str) -> int:
@@ -37,16 +41,10 @@ def get_solar_system_name(solar_system_id: int) -> str:
 
 
 def get_solar_system_name_list() -> list:
-    global solar_system_list
-
-    if len(solar_system_list) == 0:
+    if len(solar_system_name_list) == 0:
         init()
 
-    name_list = []
-    for solar_system in solar_system_dict:
-        name_list.append(solar_system['name'])
-
-    return name_list
+    return solar_system_name_list
 
 
 def _get_character_id_from_esi(character_name: str) -> int:
@@ -109,6 +107,7 @@ def _get_route_from_esi(origin_id: int, destination_id: int) -> list:
     从ESI获取星系距离
     """
 
+    print('从ESI获取星系距离')
     url = f'https://esi.evepc.163.com/latest/route/{origin_id}/{destination_id}/?datasource=serenity&flag=shortest'
     response = requests.get(url)
     if response.status_code == 200:

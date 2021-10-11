@@ -21,13 +21,13 @@ def ts_to_str(ts: int) -> str:
 def ts_to_str_format(ts: int) -> str:
     dt = cal_dt(ts)
     if dt < 60:
-        return f'{int(dt)}秒'
-        # return f'刚刚'
+        # return f'{int(dt)}秒'
+        return f'刚刚'
     elif dt < 3600:
-        return f'{int(dt//60)}分钟前'
+        return f'{int(dt//60)}分'
     elif dt < 86400:
         h = int(dt // 3600)
         m = int((dt % 3600) // 60)
-        return f'{h}小时{m}分前'
+        return f'{h}小时{m}分'
     else:
         return time.strftime(r'%Y-%m-%d %H:%M:%S', time.localtime(ts))

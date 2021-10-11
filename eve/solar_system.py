@@ -11,7 +11,7 @@ class TYPE_NAME:
 
 region_list = []
 constellation_list = []
-solar_system_list = []
+solar_system_name_list = []
 
 empire_area_name_list = [
     '卡多尔', '吉勒西斯', '塔什蒙贡', '幽暗之域', '柯埃佐', '破碎', '艾里迪亚',
@@ -81,7 +81,7 @@ test_area_name_list = ['ADR01', 'ADR02', 'ADR03', 'ADR04', 'ADR05', 'PR-01']
 def init_data():
     global region_list
     global constellation_list
-    global solar_system_list
+    global solar_system_name_list
 
     # 读取数据
     def load_data_file(data_file: str) -> list:
@@ -117,7 +117,7 @@ def get_id_list(name_list: list, type_name: TYPE_NAME) -> list:
     elif type_name == TYPE_NAME.Constellation:
         full_list = constellation_list
     elif type_name == TYPE_NAME.SolarSystem:
-        full_list = solar_system_list
+        full_list = solar_system_name_list
 
     for item in full_list:
         if item['name'] in name_list:
@@ -171,9 +171,9 @@ def get_solar_system_list(all_universe: bool = True,
                           ) -> list:
     init_data()
     if all_universe:
-        return solar_system_list
+        return solar_system_name_list
 
-    watch_list = deepcopy(solar_system_list)
+    watch_list = deepcopy(solar_system_name_list)
 
     # 筛选虫洞星域
     if not wormhole:
@@ -198,16 +198,16 @@ def get_solar_system_list(all_universe: bool = True,
     # 筛选北方星域
     if only_north:
         north_area_id_list = get_region_id_list(north_area_name_list)
-        watch_list = deepcopy(solar_system_list)
-        for s in solar_system_list:
+        watch_list = deepcopy(solar_system_name_list)
+        for s in solar_system_name_list:
             if s['region'] not in north_area_id_list:
                 watch_list.remove(s)
 
     # 筛选南方星域
     if only_sourth:
         sourth_area_id_list = get_region_id_list(south_area_name_list)
-        watch_list = deepcopy(solar_system_list)
-        for s in solar_system_list:
+        watch_list = deepcopy(solar_system_name_list)
+        for s in solar_system_name_list:
             if s['region'] not in sourth_area_id_list:
                 watch_list.remove(s)
 
@@ -252,7 +252,7 @@ def get_solar_system_list(all_universe: bool = True,
         # 将白名单ID列表重新映射成星系列表
         white_solar_system_list = []
         for solar_system_id in white_solar_system_id_list:
-            for s in solar_system_list:
+            for s in solar_system_name_list:
                 if s['id'] == solar_system_id:
                     white_solar_system_list.append(s)
                     break
@@ -269,7 +269,7 @@ if __name__ == '__main__':
     init_data()
     print(f'星域数量：{len(region_list)}')
     print(f'星座数量：{len(constellation_list)}')
-    print(f'星系数量：{len(solar_system_list)}\n')
+    print(f'星系数量：{len(solar_system_name_list)}\n')
 
     black_list = {
         'solar_system': ['舍勒拉', '拉什希亚']

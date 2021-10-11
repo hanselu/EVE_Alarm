@@ -1263,7 +1263,7 @@ constellation_list = [
     {'id': 23000001, 'name': 'PC-001'}
 ]
 
-solar_system_list = [
+solar_system_name_list = [
     {'id': 30000001, 'name': '坦欧', 'region': 10000001, 'constellation': 20000001},
     {'id': 30000002, 'name': '拉什希亚', 'region': 10000001, 'constellation': 20000001},
     {'id': 30000003, 'name': '埃克葡温姆', 'region': 10000001, 'constellation': 20000001},
@@ -9571,7 +9571,7 @@ def create_constellation_data(data_file: str) -> list:
 
 def create_solar_system_data(data_file: str) -> list:
     print('创建星系数据')
-    return create_data(data_file, solar_system_list)
+    return create_data(data_file, solar_system_name_list)
 
 
 if __name__ == '__main__':

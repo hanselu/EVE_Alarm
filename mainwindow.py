@@ -179,6 +179,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # print(f'{int(common.get_ts())} 按下按钮')
         thread = Thread(target=self.update_alarms)
         thread.start()
+        thread.join()
         # self.update_alarms()
 
     def btn_Auto_Clicked(self):
