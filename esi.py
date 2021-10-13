@@ -107,6 +107,9 @@ def _get_route_from_esi(origin_id: int, destination_id: int) -> list:
     从ESI获取星系距离
     """
 
+    if origin_id == destination_id:
+        return [origin_id]
+
     print('从ESI获取星系距离')
     url = f'https://esi.evepc.163.com/latest/route/{origin_id}/{destination_id}/?datasource=serenity&flag=shortest'
     response = requests.get(url)
@@ -123,7 +126,7 @@ def cal_route(origin: str, destination: str) -> list:
     """
 
     if origin == destination:
-        return []
+        return [origin]
 
     # 获取星系ID
     origin_id = get_solar_system_id(origin)

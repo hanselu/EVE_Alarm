@@ -57,7 +57,7 @@ class Alarm:
         if self.route is None:
             return -1
         else:
-            return len(self.route)-1
+            return len(self.route) - 1
 
     def enter(self, location: str = None) -> str:
         if location:
